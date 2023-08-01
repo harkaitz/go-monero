@@ -1,0 +1,6 @@
+github.com/Rhymond/go-money v1.0.9 h1:Yr7wSat9cJcf9BGnQl2QY2yyUMvR/exol57uNL/5p8c=
+github.com/Rhymond/go-money v1.0.9/go.mod h1:iHvCuIvitxu2JIlAlhF0g9jHqjRSr+rpdOs7Omqlupg=
+github.com/harkaitz/go-u27 v0.0.0-20230801183151-2456ff8db8fe h1:ts/WI7f363j+pkcGJJmUiiq4AKrMrER5Wss20nSK/J4=
+github.com/harkaitz/go-u27 v0.0.0-20230801183151-2456ff8db8fe/go.mod h1:GH+L5FkoSKz6hQmX23W0md6IY4O01Q+n1zXFa1xXNE0=
+github.com/pborman/getopt/v2 v2.1.0 h1:eNfR+r+dWLdWmV8g5OlpyrTYHkhVNxHBdN2cCrJmOEA=
+github.com/pborman/getopt/v2 v2.1.0/go.mod h1:4NtW75ny4eBw9fO1bhtNdYTlZKYX5/tBLtsOpwKIKd0=
