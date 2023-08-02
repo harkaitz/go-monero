@@ -1,4 +1,7 @@
 
 ## -- BLOCK:go --
-build/monero-cli*
+build/*
+releases/*
 ## -- BLOCK:go --
+## -- BLOCK:license --
+## -- BLOCK:license --
