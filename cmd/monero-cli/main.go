@@ -14,7 +14,7 @@ A simple monero RPC client.
 
   -B                  : View balance.
   -R AMOUNT [-d DESC] : Print payment URI and payment ID, height to charge.
-  -P URI              : Pay payment URI.
+  -P URI [AMOUNT]     : Pay payment URI.
   -C HEIGHT PAYID...  : Check payments.
   -L aiopfd           : List transfers (all,in,out,pending,failed,[d]pool)
   -A                  : Get height.
@@ -23,8 +23,21 @@ Copyright (c) 2023 Harkaitz Agirre, harkaitz.aguirre@gmail.com`
 
 func main() {
 	
-	var err   error
-	var m     monero.Monero
+	var err         error
+	var m           monero.Monero
+	var balance     monero.Balance
+	var amount      monero.XMRAtom
+	var height      monero.XMRHeight
+	var ids       []monero.XMRPaymentID
+	var paymentID   monero.XMRPaymentID
+	var pays      []monero.XMRPayment
+	var pay         monero.XMRPayment
+	var transfers []monero.XMRTransfer
+	var transfer    monero.XMRTransfer
+	var id          string
+	var i           int
+	var uri         string
+	var args      []string
 	
 	defer func() {
 		if err != nil {
@@ -33,7 +46,6 @@ func main() {
 		}
 	}()
 	
-	hFlag := getopt.BoolLong("help", 'h')
 	pFlag := getopt.Int('p', 0)
 	dFlag := getopt.String('d', "")
 	BFlag := getopt.Bool('B')
@@ -46,26 +58,15 @@ func main() {
 	getopt.SetUsage(func() { fmt.Println(help) })
 	getopt.Parse()
 	
-	if *hFlag || (!*BFlag && *RFlag=="" && *PFlag=="" && *LFlag=="" && *CFlag=="" && !*AFlag) {
-		getopt.Usage()
-		return
-	}
-	
 	m = monero.CreateMonero(*pFlag)
 	
 	switch {
 	case *BFlag:
-		var balance monero.Balance
 		balance, err = m.GetBalance()
-		if err != nil {
-			return
-		}
+		if err != nil { return }
+		
 		fmt.Print(balance)
 	case *RFlag != "":
-		var uri       string
-		var amount    monero.XMRAtom
-		var paymentID monero.XMRPaymentID
-		var height    monero.XMRHeight
 		amount, err = monero.StrXMRAtom(*RFlag)
 		if err != nil { return }
 		
@@ -74,15 +75,17 @@ func main() {
 		
 		fmt.Printf("%v\n%v %v\n", uri, height, paymentID)
 	case *PFlag != "":
-		err = m.PayURI(*PFlag)
-		if err != nil { return }
+		args = getopt.Args()
+		if len(args) == 1 {
+			amount, err = monero.StrXMRAtom(args[0])
+			if err != nil { return }
+			err = m.PayURIAmount(*PFlag, amount)
+			if err != nil { return }
+		} else {
+			err = m.PayURI(*PFlag)
+			if err != nil { return }
+		}
 	case *CFlag != "":
-		var height   monero.XMRHeight
-		var ids    []monero.XMRPaymentID
-		var pays   []monero.XMRPayment
-		var pay      monero.XMRPayment
-		var id       string
-		var i        int
 		
 		height, err = monero.StrXMRHeight(*CFlag)
 		if err != nil { return }
@@ -101,8 +104,6 @@ func main() {
 			fmt.Println(pay)
 		}
 	case *LFlag != "":
-		var transfers []monero.XMRTransfer
-		var transfer    monero.XMRTransfer
 		if *LFlag == "a" {
 			*LFlag = "iopfd"
 		}
@@ -115,12 +116,13 @@ func main() {
 			fmt.Println(transfer)
 		}
 	case *AFlag:
-		var height monero.XMRHeight
 		height, err = m.GetHeight()
 		if err != nil {
 			return
 		}
 		fmt.Printf("%v\n", height)
+	default:
+		getopt.Usage()
 	}
 	
 	return

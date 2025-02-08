@@ -46,10 +46,6 @@ func (m *Monero) ParseURI(uri string) (uriS XMRURI, err error) {
 		err = errors.New("The uri does not contain an address.")
 		return
 	}
-	if result.Uri.Amount == 0 {
-		err = errors.New("The uri does not contain an amount.")
-		return
-	}
 	
 	uriS = result.Uri
 	return
@@ -62,8 +58,26 @@ func (m *Monero) PayURI(uri string) (err error) {
 	uriS, err = m.ParseURI(uri)
 	if err != nil { return }
 	
+	if uriS.Amount == 0 {
+		err = errors.New("The uri does not contain an amount.")
+		return
+	}
+	
 	dest[0].Address = uriS.Address
 	dest[0].Amount  = uriS.Amount
+	
+	return m.Transfer(EmptyXMRPaymentID, dest)
+}
+
+func (m *Monero) PayURIAmount(uri string, amount XMRAtom) (err error) {
+	var uriS XMRURI
+	var dest []XMRDestination = make([]XMRDestination, 1)
+	
+	uriS, err = m.ParseURI(uri)
+	if err != nil { return }
+	
+	dest[0].Address = uriS.Address
+	dest[0].Amount  = amount
 	
 	return m.Transfer(EmptyXMRPaymentID, dest)
 }
